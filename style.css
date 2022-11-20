@@ -1,0 +1,17 @@
+* {
+    box-sizing: border-box;
+    font: 16px Arial, sans-serif;
+}
+
+body {
+    background-color: #223;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 97vh;
+
+}
+
+#automata {
+    background-color: black;
+}
