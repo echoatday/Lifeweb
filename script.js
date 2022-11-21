@@ -8,8 +8,8 @@ var boxh = 10;
 var posx = 0;
 var posy = 0;
 
-var playerx = 12;
-var playery = 12;
+var playerx = 306;
+var playery = 306;
 var speed = 2;
 var moving = false;
 var velx = 0;
@@ -17,9 +17,10 @@ var vely = 0;
 
 var gridarray = [];
 var copyarray = [];
-var gridsize = 50;
+var gridsize = 50; // its 51 actually, just go with it
 
 var counter = 0;
+var dead = false;
 
 startGrid();
 
@@ -38,9 +39,22 @@ window.addEventListener('keyup',doKeyUp,true);
 */
 
 function drawScreen() {
+    if(dead) { 
+        ctx.font = "40px Arial";
+        ctx.fillStyle = "#FFF";
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 4;
+        ctx.strokeText("THAT'S LIFE",c.width/2-100,c.height/2);
+        ctx.fillText("THAT'S LIFE",c.width/2-100,c.height/2);
+        ctx.font = "20px Arial";
+        ctx.strokeText("press SPACE to restart",c.width/2-85,c.height/2+20);
+        ctx.fillText("press SPACE to restart",c.width/2-85,c.height/2+20);
+        return; 
+    }
     clear();
     counter = counter + 1;
     playerMovement();
+    playerHurtbox();
     doGrid(counter); // life updates every 20 ticks (200 speed)
     if(counter >= 20) { counter = 0; }
     ctx.fillStyle = "#F0A";
@@ -60,13 +74,46 @@ function clear() { // clear space between grid squares
     }
 }
 
-function playerMovement() {
+function playerMovement() { // handle player's controls
     var movey = playery+vely*speed;
     var movex = playerx+velx*speed;
     if(movey > 6 && movey < 606) { playery = movey; }
     else { playery = clampNumber(movey, 6, 606); }
     if(movex > 6 && movex < 606) { playerx = movex; }
     else { playerx = clampNumber(movex, 6, 606); }
+}
+
+function playerHurtbox() { // draw hitbox and its collision
+    var left = playerx-1;
+    var top = playery-1;
+    var right = playerx+1;
+    var bot = playery+1;
+
+    var gridleft = Math.floor(left/12);
+    var gridtop = Math.floor(top/12);
+    var gridright = Math.floor(right/12);
+    var gridbot = Math.floor(bot/12);
+
+    var size = 12;
+    var collision = gridarray[gridtop][gridleft] + 
+                    gridarray[gridtop][gridright] + 
+                    gridarray[gridbot][gridleft] + 
+                    gridarray[gridbot][gridright];
+    // console.log(collision + " . " + gridleft + " " + gridright + " " + gridtop + " " + gridbot);
+
+    if (collision >= 1) {
+        dead = true;
+    }
+
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(gridleft*12,gridtop*12);
+    ctx.lineTo(gridright*12+size,gridtop*12);
+    ctx.lineTo(gridright*12+size,gridbot*12+size);
+    ctx.lineTo(gridleft*12,gridbot*12+size);
+    ctx.lineTo(gridleft*12,gridtop*12);
+    ctx.stroke();
 }
 
 function doKeyDown(e) {
@@ -84,6 +131,9 @@ function doKeyDown(e) {
             case 68: //d
                 velx = 1;
                 break;
+            case 32: //space
+                startGrid();
+                break; 
         }
     }
 }
@@ -131,11 +181,15 @@ function doGrid(counter) { // big grid function
 }
 
 function startGrid() { // initialize 2d array at defined size with randomized cells
+    playerx = 120;
+    playery = 120;
+    dead = false;
+    
     for(var x = 0; x <= gridsize; x += 1) {
         gridarray[x] = [];
         copyarray[x] = [];
         for(var y = 0; y <= gridsize; y += 1) {
-            if(x>10 && y>10) {
+            if(x>20 || y>20) {
             gridarray[x][y] = randomBool();
             copyarray[x][y] = gridarray[x][y];
             }
