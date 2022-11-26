@@ -1,9 +1,10 @@
-Life, written in vanilla Javascript for web consumption.
-May run slowly on some browsers.
+Life, written in vanilla Javascript for web consumption. May run slowly on some systems.
 
-Playable State: SURVIVAL
+Playable State: SNAKE
 
-You are a little pink circle. If you touch Life, you fail. Outside of your starting area, Life cells initialize randomly, then develop according to their rules. They'll eventually stagnate, which is kind of like winning. Your yellow hurtbox is visible for testing and clarity.
+You are a little pink circle. If you touch Life, you die. Eliminate 'Fruit Cells' by firing Life at them. Each FC is worth 1 point. Difficulty not yet implemented.
 
 Controls:
-WASD to move, SPACE to reset
+WASD to move
+UJOL to shoot
+SPACE to reset

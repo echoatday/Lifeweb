@@ -15,14 +15,20 @@ var moving = false;
 var velx = 0;
 var vely = 0;
 
+var fruitx = 40;
+var fruity = 40;
+var shootdl = false;
+
 var gridarray = [];
 var copyarray = [];
 var gridsize = 50; // its 51 actually, just go with it
 
 var counter = 0;
 var dead = false;
+var score = 0;
 
 startGrid();
+spawnFruit();
 
 // setInterval(doGrid, 200);
 setInterval(drawScreen, 10);
@@ -30,16 +36,10 @@ setInterval(drawScreen, 10);
 window.addEventListener('keydown',doKeyDown,true);
 window.addEventListener('keyup',doKeyUp,true);
 
-/*
-    playerx is a position 0 to 607
-    playery is a position 0 to 607
-    gridarray[x][y]
-        x*12+1 is the formula to convert to position in doGrid
-        so, if gridarray[playerx/12-1][playery/12-1] == 1, print you died screen
-*/
-
 function drawScreen() {
-    if(dead) { 
+    document.getElementById("score").innerHTML = score.toString();
+
+    if(dead) {
         ctx.font = "40px Arial";
         ctx.fillStyle = "#FFF";
         ctx.strokeStyle = "#000";
@@ -59,6 +59,7 @@ function drawScreen() {
     if(counter >= 20) { counter = 0; }
     ctx.fillStyle = "#F0A";
     playerCircle(playerx,playery,5);
+    drawFruit();
 }
 
 function playerCircle(x,y,radius) { // circle path
@@ -83,7 +84,7 @@ function playerMovement() { // handle player's controls
     else { playerx = clampNumber(movex, 6, 606); }
 }
 
-function playerHurtbox() { // draw hitbox and its collision
+function playerHurtbox() { // draw hurtbox and its collision
     var left = playerx-1;
     var top = playery-1;
     var right = playerx+1;
@@ -105,19 +106,54 @@ function playerHurtbox() { // draw hitbox and its collision
         dead = true;
     }
 
-    ctx.strokeStyle = "yellow";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(gridleft*12,gridtop*12);
-    ctx.lineTo(gridright*12+size,gridtop*12);
-    ctx.lineTo(gridright*12+size,gridbot*12+size);
-    ctx.lineTo(gridleft*12,gridbot*12+size);
-    ctx.lineTo(gridleft*12,gridtop*12);
-    ctx.stroke();
+    // ctx.strokeStyle = "yellow";
+    // ctx.lineWidth = 2;
+    // ctx.beginPath();
+    // ctx.moveTo(gridleft*12,gridtop*12);
+    // ctx.lineTo(gridright*12+size,gridtop*12);
+    // ctx.lineTo(gridright*12+size,gridbot*12+size);
+    // ctx.lineTo(gridleft*12,gridbot*12+size);
+    // ctx.lineTo(gridleft*12,gridtop*12);
+    // ctx.stroke();
+}
+
+function playerShoot(dirx, diry, key) {
+    var gridy = Math.floor(playerx/12)+dirx;
+    var gridx = Math.floor(playery/12)+diry;
+    
+    copyarray[gridx][gridy] = 1;
+    switch(key) {
+        case 'u':
+            copyarray[gridx+1][gridy+1] = 1;
+            copyarray[gridx-1][gridy] = 1;
+            copyarray[gridx][gridy-1] = 1;
+            copyarray[gridx+1][gridy-1] = 1;
+            break;
+        case 'j':
+            copyarray[gridx-1][gridy+1] = 1;
+            copyarray[gridx+1][gridy] = 1;
+            copyarray[gridx][gridy-1] = 1;
+            copyarray[gridx-1][gridy-1] = 1;
+            break;
+        case 'o':
+            copyarray[gridx+1][gridy-1] = 1;
+            copyarray[gridx-1][gridy] = 1;
+            copyarray[gridx][gridy+1] = 1;
+            copyarray[gridx+1][gridy+1] = 1;
+            break;
+        case 'l':
+            copyarray[gridx-1][gridy-1] = 1;
+            copyarray[gridx+1][gridy] = 1;
+            copyarray[gridx][gridy+1] = 1;
+            copyarray[gridx-1][gridy+1] = 1;
+            break;
+    }
 }
 
 function doKeyDown(e) {
     if(!e.repeat && vely >= -1 && vely <= 1 && velx >= -1 && velx <= 1) {
+        var distance = 3;
+
         switch (e.keyCode) {
             case 87: //w
                 vely = -1;
@@ -132,8 +168,21 @@ function doKeyDown(e) {
                 velx = 1;
                 break;
             case 32: //space
+                score = 0;
                 startGrid();
                 break; 
+            case 85: //u
+                playerShoot(distance*-1,distance*-1, 'u');
+                break;
+            case 74: //j
+                playerShoot(distance*-1,distance, 'j');
+                break;
+            case 79: //o
+                playerShoot(distance,distance*-1, 'o');
+                break;
+            case 76: //l
+                playerShoot(distance,distance, 'l');
+                break;
         }
     }
 }
@@ -189,13 +238,41 @@ function startGrid() { // initialize 2d array at defined size with randomized ce
         gridarray[x] = [];
         copyarray[x] = [];
         for(var y = 0; y <= gridsize; y += 1) {
-            if(x>20 || y>20) {
-            gridarray[x][y] = randomBool();
+            gridarray[x][y] = 0; 
             copyarray[x][y] = gridarray[x][y];
-            }
-            else { gridarray[x][y] = 0; copyarray[x][y] = gridarray[x][y]; }
         }
     }
+}
+
+function spawnFruit() {
+    var tempx = randomCoord();
+    var tempy = randomCoord();
+
+    while(gridarray[tempx][tempy] == 1) {
+        tempx = randomCoord();
+        tempy = randomCoord();
+    }
+    fruitx = tempx;
+    fruity = tempy;
+}
+
+function drawFruit() {
+    var size = 12;
+
+    if(gridarray[fruity][fruitx] == 1) {
+        score += 1;
+        spawnFruit();
+    }
+
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(fruitx*12,fruity*12);
+    ctx.lineTo(fruitx*12+size,fruity*12);
+    ctx.lineTo(fruitx*12+size,fruity*12+size);
+    ctx.lineTo(fruitx*12,fruity*12+size);
+    ctx.lineTo(fruitx*12,fruity*12);
+    ctx.stroke();
 }
 
 function rulesEnforcer(total, cell) { // automata rules. currently, conway's game of life.
@@ -240,8 +317,8 @@ function nearbyCells(x, y) { // check all nearby cells according to automata sca
     return total;
 }
 
-function randomBool() { // just a random 0 or 1
-    return Math.floor(Math.random() * 2);
+function randomCoord() { // a random cell
+    return Math.floor(Math.random() * 51);
 }
 
 function clampNumber(num, a, b) {
