@@ -10,8 +10,8 @@ var posy = 0;
 
 var playerx = 306;
 var playery = 306;
-var speed = 5;
-var lifespeed = 4;
+var playerspeed = 3;
+var lifespeed = 10;
 var moving = false;
 var velx = 0;
 var vely = 0;
@@ -84,8 +84,8 @@ function clear() { // clear space between grid squares
 }
 
 function playerMovement() { // handle player's controls
-    var movey = playery+vely*speed;
-    var movex = playerx+velx*speed;
+    var movey = playery+vely*playerspeed;
+    var movex = playerx+velx*playerspeed;
     if(movey > 6 && movey < 606) { playery = movey; }
     else { playery = clampNumber(movey, 6, 606); }
     if(movex > 6 && movex < 606) { playerx = movex; }
