@@ -1,6 +1,6 @@
 * {
     box-sizing: border-box;
-    font: 16px Arial, sans-serif;
+    font: 16px Monospace, sans-serif;
 }
 
 body {
@@ -16,6 +16,21 @@ body {
     background-color: black;
 }
 
-#score {
+.hud {
+    color: yellow;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
     color: white;
+    margin-left: 1em;
+    margin-right: 1em;
+    font-weight: 700;
 }

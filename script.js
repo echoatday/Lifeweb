@@ -10,7 +10,8 @@ var posy = 0;
 
 var playerx = 306;
 var playery = 306;
-var speed = 2;
+var speed = 5;
+var lifespeed = 4;
 var moving = false;
 var velx = 0;
 var vely = 0;
@@ -26,6 +27,7 @@ var gridsize = 50; // its 51 actually, just go with it
 var counter = 0;
 var dead = false;
 var score = 0;
+var timer = 100;
 
 startGrid();
 spawnFruit();
@@ -37,18 +39,17 @@ window.addEventListener('keydown',doKeyDown,true);
 window.addEventListener('keyup',doKeyUp,true);
 
 function drawScreen() {
-    document.getElementById("score").innerHTML = score.toString();
+    document.getElementById("score").innerHTML = "<span class=\"label\">SCORE</span>" + score.toString();
+    document.getElementById("timer").innerHTML = timer.toString() + "<span class=\"label\">TIME</span>";
 
     if(dead) {
         ctx.font = "40px Arial";
         ctx.fillStyle = "#FFF";
         ctx.strokeStyle = "#000";
         ctx.lineWidth = 4;
-        ctx.strokeText("THAT'S LIFE",c.width/2-100,c.height/2);
-        ctx.fillText("THAT'S LIFE",c.width/2-100,c.height/2);
+        ctx.strokeText("THAT'S LIFE",playerx-110,playery-20);
+        ctx.fillText("THAT'S LIFE",playerx-110,playery-20);
         ctx.font = "20px Arial";
-        ctx.strokeText("press SPACE to restart",c.width/2-85,c.height/2+20);
-        ctx.fillText("press SPACE to restart",c.width/2-85,c.height/2+20);
         return; 
     }
     clear();
@@ -56,10 +57,17 @@ function drawScreen() {
     playerMovement();
     playerHurtbox();
     doGrid(counter); // life updates every 20 ticks (200 speed)
-    if(counter >= 20) { counter = 0; }
+    if(counter >= lifespeed) { 
+        timer = timer - 1;
+        counter = 0; 
+    }
     ctx.fillStyle = "#F0A";
     playerCircle(playerx,playery,5);
     drawFruit();
+
+    if(timer == 0) {
+        dead = true;
+    }
 }
 
 function playerCircle(x,y,radius) { // circle path
@@ -206,7 +214,7 @@ function doKeyUp(e) {
 
 
 function doGrid(counter) { // big grid function
-    if(counter>=20) {
+    if(counter>=lifespeed) {
         gridarray = structuredClone(copyarray);
     }
 
@@ -215,7 +223,7 @@ function doGrid(counter) { // big grid function
         for(var y=0; y <= gridsize; y += 1) {
             posx = y*12+1;
 
-            if(counter>=20) {
+            if(counter>=lifespeed) {
                 copyarray[x][y] = rulesEnforcer(nearbyCells(x,y),gridarray[x][y]);
             }
 
@@ -230,8 +238,9 @@ function doGrid(counter) { // big grid function
 }
 
 function startGrid() { // initialize 2d array at defined size with randomized cells
-    playerx = 120;
-    playery = 120;
+    playerx = 306;
+    playery = 306;
+    timer = 100;
     dead = false;
     
     for(var x = 0; x <= gridsize; x += 1) {
@@ -245,13 +254,15 @@ function startGrid() { // initialize 2d array at defined size with randomized ce
 }
 
 function spawnFruit() {
-    var tempx = randomCoord();
-    var tempy = randomCoord();
+    var tempx = randomCoord()+5;
+    var tempy = randomCoord()+5;
+    timer = timer + 15;
 
     while(gridarray[tempx][tempy] == 1) {
-        tempx = randomCoord();
-        tempy = randomCoord();
+        tempx = randomCoord()+5;
+        tempy = randomCoord()+5;
     }
+
     fruitx = tempx;
     fruity = tempy;
 }
@@ -260,6 +271,20 @@ function drawFruit() {
     var size = 12;
 
     if(gridarray[fruity][fruitx] == 1) {
+        copyarray[fruity][fruitx] = 0;
+        copyarray[fruity+1][fruitx] = 0;
+        copyarray[fruity-1][fruitx] = 0;
+        copyarray[fruity+2][fruitx] = 1;
+        copyarray[fruity-2][fruitx] = 1;
+        copyarray[fruity+1][fruitx+1] = 1;
+        copyarray[fruity+1][fruitx-1] = 1;
+        copyarray[fruity-1][fruitx-1] = 1;
+        copyarray[fruity-1][fruitx+1] = 1;
+        copyarray[fruity][fruitx+1] = 1;
+        copyarray[fruity][fruitx+2] = 1;
+        copyarray[fruity][fruitx-1] = 1;
+        copyarray[fruity][fruitx-2] = 1;
+
         score += 1;
         spawnFruit();
     }
@@ -318,7 +343,7 @@ function nearbyCells(x, y) { // check all nearby cells according to automata sca
 }
 
 function randomCoord() { // a random cell
-    return Math.floor(Math.random() * 51);
+    return Math.floor(Math.random() * 41);
 }
 
 function clampNumber(num, a, b) {

@@ -5,11 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Near-Automata</title>
+    <title>Speed Life</title>
 </head>
 <body>
-    <span id="score"></span>
-    <canvas id="automata" width="612" height="612"></canvas>
-    <script src="script.js"></script>
+    <div class="game">
+        <div class="hud">
+            <span id="score" class="hud"></span>
+            <span id="timer" class="hud"></span>
+        </div>
+        <canvas id="automata" width="612" height="612"></canvas>
+        <script src="script.js"></script>
+        <div class="hud">
+            <span>!</span><span class="label">WASD to move</span><span class="label">UJOL to shoot</span><span class="label">SPACE to reset</span><span>!</span>
+        </div>
+    </div>
 </body>
 </html>
