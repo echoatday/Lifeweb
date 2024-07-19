@@ -27,7 +27,7 @@ var gridsize = 50; // its 51 actually, just go with it
 var counter = 0;
 var dead = false;
 var score = 0;
-var timer = 100;
+var timer = 100 - 15; // spawnfruit +15 makes this 100
 
 startGrid();
 spawnFruit();
@@ -58,7 +58,7 @@ function drawScreen() {
     playerHurtbox();
     doGrid(counter); // life updates every 20 ticks (200 speed)
     if(counter >= lifespeed) { 
-        timer = timer - 1;
+        if(score > 0) { timer = timer - 1; }
         counter = 0; 
     }
     ctx.fillStyle = "#F0A";
@@ -240,7 +240,7 @@ function doGrid(counter) { // big grid function
 function startGrid() { // initialize 2d array at defined size with randomized cells
     playerx = 306;
     playery = 306;
-    timer = 100;
+    timer = 100 - 15;
     dead = false;
     
     for(var x = 0; x <= gridsize; x += 1) {
@@ -251,6 +251,7 @@ function startGrid() { // initialize 2d array at defined size with randomized ce
             copyarray[x][y] = gridarray[x][y];
         }
     }
+    spawnFruit();
 }
 
 function spawnFruit() {
