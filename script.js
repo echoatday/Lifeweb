@@ -30,7 +30,6 @@ var score = 0;
 var timer = 100 - 15; // spawnfruit +15 makes this 100
 
 startGrid();
-spawnFruit();
 
 // setInterval(doGrid, 200);
 setInterval(drawScreen, 10);
