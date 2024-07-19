@@ -69,17 +69,19 @@ function drawScreen() {
     }
 }
 
-function playerCircle(x,y,radius) { // circle path
-    ctx.beginPath();
-    ctx.arc(x,y,radius,0,Math.PI*2,true);
-    ctx.fill();
-}
-
 function clear() { // clear space between grid squares
     for(var i = 0; i < 612; i += 1) {
         if(i % 12 == 11) { ctx.clearRect(0,i,612,2); ctx.clearRect(i,0,2,612); }
         else if(i == 0 || i == 611) { ctx.clearRect(0,i,612,1); ctx.clearRect(i,0,1,612); }
     }
+}
+
+/// ------ Player Functions ------ ///
+
+function playerCircle(x,y,radius) { // circle path
+    ctx.beginPath();
+    ctx.arc(x,y,radius,0,Math.PI*2,true);
+    ctx.fill();
 }
 
 function playerMovement() { // handle player's controls
@@ -211,6 +213,7 @@ function doKeyUp(e) {
     }
 }
 
+/// ------ Grid Functions ------ ///
 
 function doGrid(counter) { // big grid function
     if(counter>=lifespeed) {
@@ -341,6 +344,8 @@ function nearbyCells(x, y) { // check all nearby cells according to automata sca
 
     return total;
 }
+
+/// ------ Utility Functions ------ ///
 
 function randomCoord() { // a random cell
     return Math.floor(Math.random() * 41);
